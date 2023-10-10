@@ -11,10 +11,18 @@ public class main extends Thread{
     }
     public static void main(String[] args) {
         //sets up the threads in orders for the em to start
-        main thread = new main();
-        thread.start();
+       // main thread = new main();
+       // thread.start();
+
+       //intilized threads
+	bufferBound res = new bufferBound();
+	Thread t1 = new Thread(new producer(res));
+	Thread t2 = new Thread(new consumer(res));
+	Thread t3 = new Thread(new consumer(res));
+	t1.start();
+	
+	t2.start();	
+	t3.start();	
+
     }
 }
-
-
-    

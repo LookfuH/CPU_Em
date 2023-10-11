@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class CPU_Sim {
 
     // public ArrayList<Process_Sim> queue = new ArrayList<Process_Sim>();

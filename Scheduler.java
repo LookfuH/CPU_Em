@@ -1,15 +1,17 @@
 public class Scheduler implements Runnable {
-	private bufferBound res;
-	Process_Sim val;
 
-	public Scheduler(bufferBound res) {
-		this.res = res;
+	private bufferBound queue = new bufferBound();
+
+	public void insert(Process_Sim x) {
+		queue.insert(x);
 	}
 
 	@Override
 	public void run() {
+		Process_Sim val;
 		while (true) {
-			val = res.remove();
+			val = queue.remove();
+			System.out.println("Grabbed process");
 		}
 	}
 }

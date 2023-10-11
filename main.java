@@ -15,7 +15,7 @@ public class main extends Thread{
 
        //intilized threads
 	bufferBound<Process_Sim> res = new bufferBound<Process_Sim>();
-	Thread t1 = new Thread(new pro(res));
+	Thread t1 = new Thread(new producer(res));
 	Thread t2 = new Thread(new Scheduler(res));
 	Thread t3 = new Thread(new Scheduler(res));
 	t1.start();

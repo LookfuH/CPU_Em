@@ -18,9 +18,11 @@ public class CPU_Sim {
 
         int time = 0;
 
+        System.out.println("Recieved: " + process.name);;
+
         try {
             while (time < runTime && run) {
-                Thread.sleep(60);
+                Thread.sleep(1000);
                 time++;
             }
         } catch (InterruptedException e) {
@@ -29,6 +31,9 @@ public class CPU_Sim {
             }
 
         process.bufferTime -= time;
+
+        System.out.println("Finished: " + process.name);
+
         return process;
     }
 }

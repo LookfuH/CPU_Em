@@ -4,16 +4,15 @@ public class Scheduler implements Runnable {
 
 	public static void insert(Process_Sim x) {
 		queue.insert(x);
-		System.out.println(queue.printArr());
 	}
 
 	@Override
 	public void run() {
-		System.out.println("HI");
+	
 		Process_Sim val;
 		while (true) {
 			val = queue.remove();
-			System.out.println("Grabbed process");
+			System.out.println(val.name + " ------------> Cpu");
 		}
 	}
 }

@@ -10,8 +10,8 @@ public class main {
     thread.start();
 
     Scheduler.insert(new Process_Sim("P1", 2, 6));
-    Scheduler.insert(new Process_Sim("P2", 7, 6));
-    Scheduler.insert(new Process_Sim("P3", 9, 6));
+    Scheduler.insert(new Process_Sim("P2", 9, 6));
+    Scheduler.insert(new Process_Sim("P3", 7, 6));
 
     try {
         thread.join();

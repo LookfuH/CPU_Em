@@ -17,6 +17,8 @@ public class bufferBound {
 			} else
 				i++;
 		}
+		System.out.println(item.name + " ------------> queue at priority " + item.priority);
+
 
 		notify();
 	}
@@ -25,7 +27,7 @@ public class bufferBound {
 
 		try {
 			if (buffer.size() == 0){
-				System.out.println("Waiting");
+				System.out.println("Waiting on objects");
 				wait();
 			}
 		} catch (InterruptedException e) {
@@ -34,9 +36,9 @@ public class bufferBound {
 
 		Process_Sim item;
 
-		item = buffer.removeFirst();
+		item = buffer.remove(0);
 
-		System.out.println("Removed: " + item.name);
+		//System.out.println("Removed from queue: " + item.name);
 
 		return item;
 	}

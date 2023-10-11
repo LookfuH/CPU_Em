@@ -24,8 +24,10 @@ public class bufferBound {
 	public synchronized Process_Sim remove() {
 
 		try {
-			System.out.println("Waiting");
-			wait();
+			if (buffer.size() == 0){
+				System.out.println("Waiting");
+				wait();
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -33,9 +35,10 @@ public class bufferBound {
 		Process_Sim item;
 
 		item = buffer.removeFirst();
-		notify();
-		return item;
 
+		System.out.println("Removed: " + item.name);
+
+		return item;
 	}
 
 	public String printArr(){

@@ -1,51 +1,31 @@
-public class bufferBound<E> {
+import java.util.ArrayList;
 
-	private static final int BUFFER_SIZE = 5;
+public class bufferBound {
 
-	private int count, in, out;
+	private ArrayList<Process_Sim> buffer = new ArrayList<Process_Sim>(null);
 
-	private E[] buffer;
+	public synchronized void insert(Process_Sim item) {
+		int i = 0;
 
-	@SuppressWarnings("unchecked")
-	public bufferBound() {
-		count = 0;
-		in = 0;
-		out = 0;
-		buffer = (E[]) new Object[BUFFER_SIZE];
-
-	}
-
-	public synchronized void insert(E item) {
-		while (count == BUFFER_SIZE) {
-			try {
-				wait();
-			}
-			catch(InterruptedException ie) {}
-
+		while (true) {
+			if (i >= buffer.size()){
+				buffer.add(item);
+				break;
+			} else if (buffer.get(i).priority > item.priority){
+				buffer.add(i, item);
+				break;
+			} else
+				i++;
 		}
-		buffer[in] = item;
-		in = (in +1)%BUFFER_SIZE;
-		count++;
 
 		notify();
-
-
 	}
 
-	public synchronized E remove() {
+	public synchronized Process_Sim remove() {
 
-		E item;
+		Process_Sim item;
 
-		while (count ==0) {
-			try {
-				wait();
-			}
-			catch (InterruptedException ie) {}
-
-		}
-		item = buffer[out];
-		out = (out+1)%BUFFER_SIZE;
-		count--;
+		item = buffer.removeFirst();
 		notify();
 		return item;
 

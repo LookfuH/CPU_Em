@@ -1,11 +1,11 @@
 
 public class producer implements Runnable {
 	private bufferBound res;
-	
+
 	public producer(bufferBound res) {
 		this.res = res;
 	}
-	
+
 	@Override
 	public void run() {
 		//inserts 8 rand ints into the buffer
@@ -17,8 +17,8 @@ public class producer implements Runnable {
 			try {
 				Thread.sleep((int)(Math.random()*20));
 			} catch(InterruptedException ie){
-				
+
 			}
-		}	
+		}
 	}
 }

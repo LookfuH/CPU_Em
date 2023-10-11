@@ -8,15 +8,8 @@ public class consumer implements Runnable {
 
 	@Override
 	public void run() {
-		for(int i = 0; i < 4; i++) {
-			//grabs from buffer and calc fib
+		while (true) {
 			val = res.remove();
-
-			try {
-				Thread.sleep((int)(Math.random()*20));
-			} catch(InterruptedException ie){
-
-			}
 		}
 	}
 }

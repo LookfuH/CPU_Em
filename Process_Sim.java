@@ -7,9 +7,10 @@ public class Process_Sim {
     public double arrivalTime;
     public double startTime;
 
-    public Process_Sim(String n, int p) {
-        name = n;
-        priority = p;
+    public Process_Sim(String name, int priority, int bufferTime) {
+        this.name = name;
+        this.priority = priority;
+        this.bufferTime = bufferTime;
     }
 
     public void setArrival() {

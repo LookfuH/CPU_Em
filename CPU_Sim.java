@@ -18,21 +18,21 @@ public class CPU_Sim {
 
         int time = 0;
 
-        System.out.println("Recieved: " + process.name);;
+        System.out.println("CPU recieved: " + process.name);;
 
         try {
             while (time < runTime && run) {
-                Thread.sleep(1000);
+                Thread.sleep(500); // 1/2 sec unit time
                 time++;
             }
         } catch (InterruptedException e) {
-                System.out.println("I must have insomnia :(");
+                System.out.println("CPU must have insomnia :(");
                 e.printStackTrace();
             }
 
-        process.bufferTime -= time;
+        process.burstTime -= time;
 
-        System.out.println("Finished: " + process.name);
+        System.out.println("CPU finished: " + process.name);
 
         return process;
     }

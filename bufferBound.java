@@ -4,7 +4,7 @@ public class bufferBound {
 
 	private ArrayList<Process_Sim> buffer = new ArrayList<Process_Sim>();
 
-	public synchronized void insert(Process_Sim item) { // Works!
+	public synchronized void push(Process_Sim item) { // Works!
 		int i = 0;
 
 		while (true) {
@@ -17,17 +17,17 @@ public class bufferBound {
 			} else
 				i++;
 		}
-		System.out.println(item.name + " ------------> queue at priority " + item.priority);
+		System.out.println(item.name + " --> Queued at index: " + i + " (Priority: " + item.priority + ").");
 
 
 		notify();
 	}
 
-	public synchronized Process_Sim remove() {
+	public synchronized Process_Sim pop() {
 
 		try {
 			if (buffer.size() == 0){
-				System.out.println("Waiting on objects");
+				System.out.println("Queue empty --- Waiting on objects.");
 				wait();
 			}
 		} catch (InterruptedException e) {
@@ -41,6 +41,13 @@ public class bufferBound {
 		//System.out.println("Removed from queue: " + item.name);
 
 		return item;
+	}
+
+	public Process_Sim peek() {
+		if (buffer.size() == 0){
+			return null;
+		}
+		return buffer.get(0);
 	}
 
 	public String printArr(){

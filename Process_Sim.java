@@ -13,6 +13,7 @@ public class Process_Sim {
         this.name = name;
         this.priority = priority;
         this.cpuTime = cpuTime;
+        nextBurst();
     }
 
     public boolean nextBurst() { // returns true if there is another burst after this one, false if there is not

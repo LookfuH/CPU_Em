@@ -9,10 +9,15 @@ public class Driver {
     Thread thread = new Thread(scheduler);
     thread.start();
 
-
-    scheduler.insert(new Process_Sim("P1", 2, new int[] {2, 3, 5, 7}));
-    scheduler.insert(new Process_Sim("P2", 5, new int[] {7, 1, 2, 6}));
-    scheduler.insert(new Process_Sim("P3", 5, new int[] {13, 5, 5, 8}));
+    Scheduler.insert(new Process_Sim("P1", 5, new int[] {8, 3, 5, 7}));
+    try {
+        Thread.sleep(1);
+    } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    Scheduler.insert(new Process_Sim("P2", 2, new int[] {7, 1, 2, 6}));
+    Scheduler.insert(new Process_Sim("P3", 5, new int[] {13, 5, 5, 8}));
 
     try {
         thread.join();

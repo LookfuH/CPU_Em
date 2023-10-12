@@ -1,19 +1,12 @@
 public class CPU_Sim {
 
-    // public ArrayList<Process_Sim> queue = new ArrayList<Process_Sim>();
-
-    // public void addToQueue(Process_Sim p) {
-    //     queue.add(p);
-    //     System.out.println("Process " + p.name + " was added to the queue");
-    // }
-
     private boolean run;
 
     public void stopProcess() {
         run = false;
     }
 
-    public Process_Sim runProcesses(Process_Sim process, int runTime) {
+    public Process_Sim runProcesses(Process_Sim process, int runTime) { // TODO: CPU should wait for tick from Scheduler before continuing
         run = true;
 
         int time = 0;
@@ -26,7 +19,7 @@ public class CPU_Sim {
                 time++;
             }
         } catch (InterruptedException e) {
-                System.out.println("CPU must have insomnia :(");
+                System.err.println("CPU has insomnia :(");
                 e.printStackTrace();
             }
 

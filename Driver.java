@@ -8,9 +8,9 @@ public class Driver {
 
     Thread thread = new Thread(scheduler);
 
-    Scheduler.insert(new Process_Sim("P1", 5, new int[] {8, 3, 5, 7}));
-    Scheduler.insert(new Process_Sim("P2", 2, new int[] {7, 1, 2, 6}));
-    Scheduler.insert(new Process_Sim("P3", 5, new int[] {13, 5, 5, 8}));
+    Scheduler.insert(new Process_Sim("P1", 5, new int[] {8, 3, 5, 12}));
+    Scheduler.insert(new Process_Sim("P2", 2, new int[] {7, 1, 2, 7}));
+    Scheduler.insert(new Process_Sim("P3", 5, new int[] {13, 5, 5, 9}));
 
     thread.start();
 

@@ -35,13 +35,18 @@ public class bufferBound {
 		return buffer.get(0);
 	}
 
-	public void printArr(){
+	public String printArr(){
 		String result = "";
-		for (int i = 0; i < buffer.size(); i++){
+		int i = 0;
+		for (; i < buffer.size() - 1; i++){
 			result += buffer.get(i).name + ", ";
 		}
 
-		System.out.println(result);
+		try {
+			result += buffer.get(i).name + " ";
+		} catch (IndexOutOfBoundsException e) {}
+
+		return result;
 	}
 
 }

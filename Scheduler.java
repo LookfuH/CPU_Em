@@ -13,10 +13,9 @@ public class Scheduler implements Runnable {
 		// 	cpu.stopProcess();
 		// }
 		if (process.burstTime > 0) {
-			System.out.println(process.name + " --> Waiting queue (System time: " + currentTime + ")");
 			cpu_queue.push(process);
+			System.out.println(process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
 		} else if (process.nextBurst()) {
-			// TODO: Put IO handling here!
 			System.out.println(process.name + " --> IO");
 			insert(process);
 		}
@@ -30,12 +29,6 @@ public class Scheduler implements Runnable {
 		cpuThread.start();
 		ioThread.start();
 
-		/*
-			TODO:
-			We are supposed to simulate time here, not do it actually. Each loop should tick the CPU to advance it one unit time.
-			Each loop should also check the current processes in the queue, and determine what the scheduling should be (cpu.stopProcess should be handled down here instead)
-		 	Each loop should check what the next queued process is. If no process is aprocessible, do CPU Idle.
-		*/
 		while (true) {
 
 			if(cpu.process == null && cpu_queue.peek() != null) {
@@ -54,13 +47,14 @@ public class Scheduler implements Runnable {
 							io.process = cpu.process;
 						else
 							io_queue.push(cpu.process);
-						System.out.println(cpu.process.name + " --> IO queue (System time: " + currentTime + ")");
+						System.out.println(cpu.process.name + " --> IO queue (Queue: " + io_queue.printArr() + "System time: " + currentTime + ")");
 					}
 					cpu.process = cpu_queue.pop();
 					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
 					cpu.quantumTime = 0;
 				} else if (cpu_queue.peek().priority == cpu.process.priority && cpu.quantumTime >= quantumTime) {
-					cpu_queue.push(cpu_queue.pop());
+					cpu_queue.push(cpu.process);
+					System.out.println(cpu.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
 					cpu.process = cpu_queue.pop();
 					cpu.quantumTime = 0;
 					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
@@ -71,17 +65,18 @@ public class Scheduler implements Runnable {
 				if (io.process.burstTime <= 0) {
 					if (io.process.nextBurst()) {
 						cpu_queue.push(io.process);
-						System.out.println(io.process.name + " --> CPU queue (System time: " + currentTime + ")");
+						System.out.println(io.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
 					}
 					io.process = io_queue.pop();
+					System.out.println(io.process.name + " --> IO (System time: " + currentTime + ")");
 					io.quantumTime = 0;
 				}
 			} catch (NullPointerException e) {}
 
 			try {
 				if (cpu_queue.peek().priority < cpu.process.priority) {
-					System.out.println(cpu.process.name + " --> CPU queue (System time: " + currentTime + ")");
 					cpu_queue.push(cpu.process);
+					System.out.println(cpu.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
 					cpu.process = cpu_queue.pop();
 					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
 					cpu.quantumTime = 0;

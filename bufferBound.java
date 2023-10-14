@@ -17,30 +17,15 @@ public class bufferBound {
 			} else
 				i++;
 		}
-		System.out.println(item.name + " --> Queued at index: " + i + " (Priority: " + item.priority + ").");
-
-
-		notify();
 	}
 
 	public synchronized Process_Sim pop() {
 
-		try {
-			if (buffer.size() == 0){
-				System.out.println("Queue empty --- Waiting on objects.");
-				wait();
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (buffer.size() == 0){
+			return null;
 		}
 
-		Process_Sim item;
-
-		item = buffer.remove(0);
-
-		//System.out.println("Removed from queue: " + item.name);
-
-		return item;
+		return buffer.remove(0);
 	}
 
 	public Process_Sim peek() {
@@ -50,13 +35,13 @@ public class bufferBound {
 		return buffer.get(0);
 	}
 
-	public String printArr(){
+	public void printArr(){
 		String result = "";
 		for (int i = 0; i < buffer.size(); i++){
 			result += buffer.get(i).name + ", ";
 		}
 
-		return result;
+		System.out.println(result);
 	}
 
 }

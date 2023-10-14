@@ -1,32 +1,38 @@
-public class CPU_Sim {
+public class CPU_Sim implements Runnable {
 
-    private boolean run;
+    Process_Sim process;
+    int quantumTime = 0;
 
     public void stopProcess() {
-        run = false;
+        process = null;
+        try{
+            System.out.println("CPU quit: " + process.name);
+            Scheduler.insert(process); // Send back to scheduler
+        } catch (NullPointerException e) {}
     }
 
-    public Process_Sim runProcesses(Process_Sim process, int runTime) { // TODO: CPU should wait for tick from Scheduler before continuing
-        run = true;
+    public void setProcess(Process_Sim process) {
+        stopProcess();
+        this.process = process;
+        tick();
+    }
 
-        int time = 0;
+    public synchronized void tick() {
+        notify();
+    }
 
-        System.out.println("CPU recieved: " + process.name);;
-
-        try {
-            while (time < runTime && run) {
-                Thread.sleep(500); // 1/2 sec unit time
-                time++;
+    public synchronized void run() { // TODO: CPU should wait for tick from Scheduler before continuing
+        while (true) {
+            try {
+                wait();
+                try {
+                    process.burstTime--;
+                    quantumTime++;
+                } catch (NullPointerException e) {}
+            } catch (InterruptedException e) {
+                    System.err.println("CPU broke :(");
+                    e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-                System.err.println("CPU has insomnia :(");
-                e.printStackTrace();
-            }
-
-        process.burstTime -= time;
-
-        System.out.println("CPU finished: " + process.name);
-
-        return process;
+        }
     }
 }

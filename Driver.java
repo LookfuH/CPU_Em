@@ -55,8 +55,6 @@ public class Driver {
     } catch (FileNotFoundException e) {System.out.println("Could not find file."); e.printStackTrace(); System.exit(1);
     } catch (IndexOutOfBoundsException e) {System.out.println("Invalid"); System.exit(1);}
 
-    System.out.println(file);
-
     while(file.hasNextLine()){
         String[] line = file.nextLine().split(" ");
         String name = line[0];
@@ -67,10 +65,10 @@ public class Driver {
             bursts.add(Integer.parseInt(line[i]));
         }
         Scheduler.insert(new Process_Sim(name, arrivalTime, priority, bursts.toArray(new Integer[bursts.size()])));
-        System.out.println(name + arrivalTime + priority + bursts.toArray(new Integer[bursts.size()]).toString());
     }
 
     Scheduler scheduler = new Scheduler();
+    Thread thread = new Thread(scheduler);
 
     // Thread thread = new Thread(scheduler);
 
@@ -78,13 +76,13 @@ public class Driver {
     // Scheduler.insert(new Process_Sim("P2", 0,  2, new Integer[] {7, 1, 2, 7}));
     // Scheduler.insert(new Process_Sim("P3", 13, 5, new Integer[] {13, 5, 5, 9}));
 
-    scheduler.run();
+    thread.start();
 
-    // try {
-    //     thread.join();
-    // } catch (InterruptedException e) {
-    //     // TODO Auto-generated catch block
-    //     e.printStackTrace();
-    // }
+    try {
+        thread.join();
+    } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
     }
 }

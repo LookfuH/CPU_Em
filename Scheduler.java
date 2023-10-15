@@ -13,7 +13,8 @@ public class Scheduler implements Runnable {
 	private static ArrayList<Process_Sim> finishedQueue = new ArrayList<Process_Sim>();
 	private int added = 0;
 	private boolean hasRun = false;
-	private int waitingTime = 0;
+	private int cpuWaitingTime = 0;
+	private int ioWaitingTime = 0;
 	public static boolean auto;
 	public static boolean rr;
 
@@ -31,14 +32,29 @@ public class Scheduler implements Runnable {
         }
     }
 
-	private String printInfo() {
+	private void printInfo() {
 		String cpuProcess = cpu.process != null ? cpu.process.name : "Idle";
 		String ioProcess = io.process != null ? io.process.name : "Idle";
-		return "(System time: " + currentTime + " | CPU process: " + cpuProcess + " | IO process : " + ioProcess + " | CPU queue: " + cpu_queue.printArr() + " | IO queue: " + io_queue.printArr() + ")";
+		String cpuQueue = cpu_queue.hasData() ? cpu_queue.printArr() : "Empty";
+		String ioQueue = io_queue.hasData() ? io_queue.printArr() : "Empty";
+		System.out.println("---------------------------");
+		System.out.println("System time: " + currentTime);
+		System.out.println("CPU: " + cpuProcess);
+		System.out.println("IO: " + ioProcess);
+		System.out.println("CPU queue: " + cpuQueue);
+		System.out.println("IO queue: " + ioQueue);
+		System.out.println("---------------------------");
+
+		if (!auto){
+			System.out.print("System time: " + currentTime + " [Press ENTER to continue]");
+			Driver.in.nextLine();
+			System.out.println();
+		}
+		System.out.println();
 	}
 
 	private void pause(){
-		if (auto == true){
+		if (auto){
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
@@ -47,8 +63,6 @@ public class Scheduler implements Runnable {
 			}
 			return;
 		}
-		System.out.print("System time: " + currentTime + " [Press ENTER to continue]");
-		Driver.in.nextLine();
 	}
 
 	@Override
@@ -65,11 +79,13 @@ public class Scheduler implements Runnable {
 
 			if(cpu.process == null && cpu_queue.peek() != null) {
 				cpu.process = cpu_queue.pop();
-				System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
+				System.out.println(cpu.process.name + ": CPU queue --> CPU ");
+				printInfo();
 			}
 			if(io.process == null && io_queue.peek() != null) {
 				io.process = io_queue.pop();
-				System.out.println(io.process.name + ": IO queue --> IO " + printInfo());
+				System.out.println(io.process.name + ": IO queue --> IO ");
+				printInfo();
 			}
 
 			try {
@@ -79,31 +95,37 @@ public class Scheduler implements Runnable {
 							io.process = cpu.process;
 							Process_Sim temp = cpu.process;
 							cpu.process = null;
-							System.out.println(temp.name + ": CPU --> IO " + printInfo());
+							System.out.println(temp.name + ": CPU --> IO ");
+							printInfo();
 						} else {
 							io_queue.push(cpu.process);
 							Process_Sim temp = cpu.process;
 							cpu.process = null;
-							System.out.println(temp.name + ": CPU --> IO queue " + printInfo());
+							System.out.println(temp.name + ": CPU --> IO queue ");
+							printInfo();
 						}
 					} else {
 						Process_Sim temp = cpu.process;
 						cpu.process = null;
-						System.out.println(temp.name + ": Process finished " + printInfo());
+						System.out.println(temp.name + ": Process finished ");
+						printInfo();
 						temp.endTime = currentTime;
 						finishedQueue.add(temp);
 					}
 					cpu.process = cpu_queue.pop();
-					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
+					System.out.println(cpu.process.name + ": CPU queue --> CPU ");
+					printInfo();
 					cpu.quantumTime = 0;
 				} else if (rr && cpu_queue.peek().priority == cpu.process.priority && cpu.quantumTime >= quantumTime) {
 					cpu_queue.push(cpu.process);
 					Process_Sim temp = cpu.process;
 					cpu.process = null;
-					System.out.println(temp.name + ": CPU --> CPU queue " + printInfo());
+					System.out.println(temp.name + ": CPU --> CPU queue ");
+					printInfo();
 					cpu.process = cpu_queue.pop();
 					cpu.quantumTime = 0;
-					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
+					System.out.println(cpu.process.name + ": CPU queue --> CPU ");
+					printInfo();
 				}
 			} catch (NullPointerException e) {}
 
@@ -113,16 +135,19 @@ public class Scheduler implements Runnable {
 						cpu_queue.push(io.process);
 						Process_Sim temp = io.process;
 						io.process = null;
-						System.out.println(temp.name + ": IO --> CPU queue " + printInfo());
+						System.out.println(temp.name + ": IO --> CPU queue ");
+						printInfo();
 					} else {
 						Process_Sim temp = io.process;
 						io.process = null;
-						System.out.println(temp.name + ": Process finished " + printInfo());
+						System.out.println(temp.name + ": Process finished ");
+						printInfo();
 						temp.endTime = currentTime;
 						finishedQueue.add(temp);
 					}
 					io.process = io_queue.pop();
-					System.out.println(io.process.name + ": IO queue --> IO " + printInfo());
+					System.out.println(io.process.name + ": IO queue --> IO ");
+					printInfo();
 					io.quantumTime = 0;
 				}
 			} catch (NullPointerException e) {}
@@ -132,15 +157,18 @@ public class Scheduler implements Runnable {
 					cpu_queue.push(cpu.process);
 					Process_Sim temp = cpu.process;
 					cpu.process = null;
-					System.out.println(temp.name + ": CPU --> CPU queue" + printInfo());
+					System.out.println(temp.name + ": CPU --> CPU queue");
+					printInfo();
 					cpu.process = cpu_queue.pop();
-					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
+					System.out.println(cpu.process.name + ": CPU queue --> CPU ");
+					printInfo();
 					cpu.quantumTime = 0;
 				}
 			} catch (NullPointerException e) {}
 
 			pause();
-			waitingTime += cpu_queue.count();
+			cpuWaitingTime += cpu_queue.count();
+			ioWaitingTime += io_queue.count();
 			currentTime++;
 			cpu.tick();
 			io.tick();
@@ -149,7 +177,8 @@ public class Scheduler implements Runnable {
 		System.out.println("Total time: " + (currentTime-1));
 		System.out.println("CPU Utilization: " + ((cpu.usedTime-cpu.idleTime)/(double)cpu.usedTime));
 		System.out.println("Throughput: " + finishedQueue.size()/(double)currentTime);
-		System.out.println("Waiting time: " + waitingTime);
+		System.out.println("CPU Waiting time: " + cpuWaitingTime);
+		System.out.println("IO Waiting time: " + ioWaitingTime);
 		double turnAroundTime = 0.0;
 		for (Process_Sim x : finishedQueue) {
 			turnAroundTime += x.endTime - x.arrivalTime;

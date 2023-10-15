@@ -2,7 +2,7 @@ public class Process_Sim {
 
     public String name;
     public int priority;
-    public int[] cpuTime;
+    public Integer[] cpuTime;
     public int burstTime;
     public int index = 0;
 
@@ -10,7 +10,7 @@ public class Process_Sim {
     public int startTime;
     public int endTime;
 
-    public Process_Sim(String name, int arrivalTime, int priority, int[] cpuTime) {
+    public Process_Sim(String name, int arrivalTime, int priority, Integer[] cpuTime) {
         this.name = name;
         this.arrivalTime = arrivalTime;
         this.priority = priority;

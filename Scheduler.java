@@ -40,7 +40,7 @@ public class Scheduler implements Runnable {
 	private void pause(){
 		if (auto == true){
 			try {
-				Thread.sleep(500);
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				System.out.println("Scheduler has insomnia.");
 				e.printStackTrace();
@@ -59,7 +59,7 @@ public class Scheduler implements Runnable {
 		cpuThread.start();
 		ioThread.start();
 
-		while (!hasRun | cpu_queue.hasData() || io_queue.hasData() || cpu.process != null || cpu.process != null || processQueue.size() < added) {
+		while (!hasRun | cpu_queue.hasData() || io_queue.hasData() || cpu.process != null || io.process != null || processQueue.size() < added) {
 			checkArrivals();
 			hasRun = true;
 
@@ -77,7 +77,9 @@ public class Scheduler implements Runnable {
 					if (cpu.process.nextBurst()) {
 						if (io.process == null) {
 							io.process = cpu.process;
-							System.out.println(cpu.process.name + ": CPU --> IO " + printInfo());
+							Process_Sim temp = cpu.process;
+							cpu.process = null;
+							System.out.println(temp.name + ": CPU --> IO " + printInfo());
 						} else {
 							io_queue.push(cpu.process);
 							Process_Sim temp = cpu.process;
@@ -95,7 +97,6 @@ public class Scheduler implements Runnable {
 					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
 					cpu.quantumTime = 0;
 				} else if (rr && cpu_queue.peek().priority == cpu.process.priority && cpu.quantumTime >= quantumTime) {
-					System.out.println("rr");
 					cpu_queue.push(cpu.process);
 					Process_Sim temp = cpu.process;
 					cpu.process = null;

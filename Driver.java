@@ -1,10 +1,9 @@
 //if we want to start this project in java due to its native thread controls
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.Thread;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Stream;
 public class Driver {
 
     public static Scanner in = new Scanner(System.in);
@@ -44,32 +43,40 @@ public class Driver {
     System.out.print("Choose a simulation: ");
     int res = 0;
     try {
-        res = in.nextInt();
+        res = Integer.parseInt(in.nextLine());
     } catch(Exception e) {
         System.out.println("Invalid");
         System.exit(1);
     }
 
-    if(res > dir.length || res <= 0){
-        System.out.println("Invalid");
-        System.exit(1);
-    }
-    Scanner file;
+    Scanner file = null;
     try {
         file = new Scanner(dir[res-1]);
-    } catch (FileNotFoundException e) {System.out.println("Could not find file."); System.exit(1);}
+    } catch (FileNotFoundException e) {System.out.println("Could not find file."); e.printStackTrace(); System.exit(1);
+    } catch (IndexOutOfBoundsException e) {System.out.println("Invalid"); System.exit(1);}
 
-    // while(file.hasNextLine()){
-    //     file.next()
-    // }
+    System.out.println(file);
+
+    while(file.hasNextLine()){
+        String[] line = file.nextLine().split(" ");
+        String name = line[0];
+        int arrivalTime = Integer.parseInt(line[1]);
+        int priority = Integer.parseInt(line[2]);
+        List<Integer> bursts = new ArrayList<Integer>();
+        for(int i = 3; i < line.length; i++) {
+            bursts.add(Integer.parseInt(line[i]));
+        }
+        Scheduler.insert(new Process_Sim(name, arrivalTime, priority, bursts.toArray(new Integer[bursts.size()])));
+        System.out.println(name + arrivalTime + priority + bursts.toArray(new Integer[bursts.size()]).toString());
+    }
 
     Scheduler scheduler = new Scheduler();
 
     // Thread thread = new Thread(scheduler);
 
-    Scheduler.insert(new Process_Sim("P1", 0,  5, new int[] {8, 3, 5, 12}));
-    Scheduler.insert(new Process_Sim("P2", 0,  2, new int[] {7, 1, 2, 7}));
-    Scheduler.insert(new Process_Sim("P3", 13, 5, new int[] {13, 5, 5, 9}));
+    // Scheduler.insert(new Process_Sim("P1", 0,  5, new Integer[] {8, 3, 5, 12}));
+    // Scheduler.insert(new Process_Sim("P2", 0,  2, new Integer[] {7, 1, 2, 7}));
+    // Scheduler.insert(new Process_Sim("P3", 13, 5, new Integer[] {13, 5, 5, 9}));
 
     scheduler.run();
 

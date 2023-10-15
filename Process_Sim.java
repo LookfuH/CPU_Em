@@ -6,11 +6,13 @@ public class Process_Sim {
     public int burstTime;
     public int index = 0;
 
-    public double arrivalTime;
-    public double startTime;
+    public int arrivalTime;
+    public int startTime;
+    public int endTime;
 
-    public Process_Sim(String name, int priority, int[] cpuTime) {
+    public Process_Sim(String name, int arrivalTime, int priority, int[] cpuTime) {
         this.name = name;
+        this.arrivalTime = arrivalTime;
         this.priority = priority;
         this.cpuTime = cpuTime;
         nextBurst();
@@ -25,14 +27,6 @@ public class Process_Sim {
             burstTime = 0;
             return false;
         }
-    }
-
-    public void setArrival() {
-        arrivalTime = System.currentTimeMillis();
-    }
-
-    public void setStartTime() {
-        startTime = System.currentTimeMillis();
     }
 
     public void printInfo() {

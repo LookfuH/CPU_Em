@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Scheduler implements Runnable {
 
 	final int quantumTime = 3;
@@ -7,18 +9,46 @@ public class Scheduler implements Runnable {
 	private static final bufferBound cpu_queue = new bufferBound();
 	private static final bufferBound io_queue = new bufferBound();
 	private static int currentTime = 0;
+	private static ArrayList<Process_Sim> processQueue = new ArrayList<Process_Sim>();
+	private static ArrayList<Process_Sim> finishedQueue = new ArrayList<Process_Sim>();
+	private int added = 0;
+	private boolean hasRun = false;
+	private int waitingTime = 0;
+	public static boolean auto;
+	public static boolean rr;
 
 	public static void insert(Process_Sim process) {
-		// if (process.priority < currentPriority) {
-		// 	cpu.stopProcess();
-		// }
-		if (process.burstTime > 0) {
-			cpu_queue.push(process);
-			System.out.println(process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
-		} else if (process.nextBurst()) {
-			System.out.println(process.name + " --> IO");
-			insert(process);
+		processQueue.add(process);
+	}
+
+	public void checkArrivals() {
+        for(int i = 0; i < processQueue.size(); i++) {
+			if(processQueue.get(i).arrivalTime == currentTime) {
+				added++;
+    			cpu_queue.push(processQueue.get(i));
+				System.out.println(processQueue.get(i).name + ": Arrival --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
+			}
+        }
+    }
+
+	private String printInfo() {
+		String cpuProcess = cpu.process != null ? cpu.process.name : "Idle";
+		String ioProcess = io.process != null ? io.process.name : "Idle";
+		return "(System time: " + currentTime + " | CPU process: " + cpuProcess + " | IO process : " + ioProcess + " | CPU queue: " + cpu_queue.printArr() + " | IO queue: " + io_queue.printArr() + ")";
+	}
+
+	private void pause(){
+		if (auto == true){
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				System.out.println("Scheduler has insomnia.");
+				e.printStackTrace();
+			}
+			return;
 		}
+		System.out.print("System time: " + currentTime + " [Press ENTER to continue]");
+		Driver.in.nextLine();
 	}
 
 	@Override
@@ -29,35 +59,50 @@ public class Scheduler implements Runnable {
 		cpuThread.start();
 		ioThread.start();
 
-		while (true) {
+		while (!hasRun | cpu_queue.hasData() || io_queue.hasData() || cpu.process != null || cpu.process != null || processQueue.size() < added) {
+			checkArrivals();
+			hasRun = true;
 
 			if(cpu.process == null && cpu_queue.peek() != null) {
 				cpu.process = cpu_queue.pop();
-				System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
+				System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
 			}
 			if(io.process == null && io_queue.peek() != null) {
 				io.process = io_queue.pop();
-				System.out.println(io.process.name + " --> IO (System time: " + currentTime + ")");
+				System.out.println(io.process.name + ": IO queue --> IO " + printInfo());
 			}
 
 			try {
 				if (cpu.process.burstTime <= 0) {
 					if (cpu.process.nextBurst()) {
-						if (io.process == null)
+						if (io.process == null) {
 							io.process = cpu.process;
-						else
+							System.out.println(cpu.process.name + ": CPU --> IO " + printInfo());
+						} else {
 							io_queue.push(cpu.process);
-						System.out.println(cpu.process.name + " --> IO queue (Queue: " + io_queue.printArr() + "System time: " + currentTime + ")");
+							Process_Sim temp = cpu.process;
+							cpu.process = null;
+							System.out.println(temp.name + ": CPU --> IO queue " + printInfo());
+						}
+					} else {
+						Process_Sim temp = cpu.process;
+						cpu.process = null;
+						System.out.println(temp.name + ": Process finished " + printInfo());
+						temp.endTime = currentTime;
+						finishedQueue.add(temp);
 					}
 					cpu.process = cpu_queue.pop();
-					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
+					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
 					cpu.quantumTime = 0;
-				} else if (cpu_queue.peek().priority == cpu.process.priority && cpu.quantumTime >= quantumTime) {
+				} else if (rr && cpu_queue.peek().priority == cpu.process.priority && cpu.quantumTime >= quantumTime) {
+					System.out.println("rr");
 					cpu_queue.push(cpu.process);
-					System.out.println(cpu.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
+					Process_Sim temp = cpu.process;
+					cpu.process = null;
+					System.out.println(temp.name + ": CPU --> CPU queue " + printInfo());
 					cpu.process = cpu_queue.pop();
 					cpu.quantumTime = 0;
-					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
+					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
 				}
 			} catch (NullPointerException e) {}
 
@@ -65,10 +110,18 @@ public class Scheduler implements Runnable {
 				if (io.process.burstTime <= 0) {
 					if (io.process.nextBurst()) {
 						cpu_queue.push(io.process);
-						System.out.println(io.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
+						Process_Sim temp = io.process;
+						io.process = null;
+						System.out.println(temp.name + ": IO --> CPU queue " + printInfo());
+					} else {
+						Process_Sim temp = io.process;
+						io.process = null;
+						System.out.println(temp.name + ": Process finished " + printInfo());
+						temp.endTime = currentTime;
+						finishedQueue.add(temp);
 					}
 					io.process = io_queue.pop();
-					System.out.println(io.process.name + " --> IO (System time: " + currentTime + ")");
+					System.out.println(io.process.name + ": IO queue --> IO " + printInfo());
 					io.quantumTime = 0;
 				}
 			} catch (NullPointerException e) {}
@@ -76,22 +129,40 @@ public class Scheduler implements Runnable {
 			try {
 				if (cpu_queue.peek().priority < cpu.process.priority) {
 					cpu_queue.push(cpu.process);
-					System.out.println(cpu.process.name + " --> CPU queue (Queue: " + cpu_queue.printArr() + "System time: " + currentTime + ")");
+					Process_Sim temp = cpu.process;
+					cpu.process = null;
+					System.out.println(temp.name + ": CPU --> CPU queue" + printInfo());
 					cpu.process = cpu_queue.pop();
-					System.out.println(cpu.process.name + " --> CPU (System time: " + currentTime + ")");
+					System.out.println(cpu.process.name + ": CPU queue --> CPU " + printInfo());
 					cpu.quantumTime = 0;
 				}
 			} catch (NullPointerException e) {}
 
+			pause();
+			waitingTime += cpu_queue.count();
 			currentTime++;
 			cpu.tick();
 			io.tick();
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				System.out.println("Scheduler has insomnia.");
-				e.printStackTrace();
-			}
+		}
+		System.out.println("\nDone!\n");
+		System.out.println("Total time: " + (currentTime-1));
+		System.out.println("CPU Utilization: " + ((cpu.usedTime-cpu.idleTime)/(double)cpu.usedTime));
+		System.out.println("Throughput: " + finishedQueue.size()/(double)currentTime);
+		System.out.println("Waiting time: " + waitingTime);
+		double turnAroundTime = 0.0;
+		for (Process_Sim x : finishedQueue) {
+			turnAroundTime += x.endTime - x.arrivalTime;
+		}
+		turnAroundTime = turnAroundTime/finishedQueue.size();
+		System.out.println("Average turnaround time: " + turnAroundTime);
+		cpu.stopProcess();
+		io.stopProcess();
+		try {
+			cpuThread.join();
+			ioThread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

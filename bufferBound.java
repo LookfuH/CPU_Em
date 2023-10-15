@@ -49,4 +49,12 @@ public class bufferBound {
 		return result;
 	}
 
+	public boolean hasData() {
+        return buffer.size() > 0;
+    }
+
+	public int count() {
+		return buffer.size();
+	}
+
 }
